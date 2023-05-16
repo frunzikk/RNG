@@ -46,7 +46,7 @@ func (accumulator *Accumulator) checkReseed() {
 			seed = accumulator.pool[i].Sum(seed)
 			accumulator.pool[i].Reset()
 		}
-		accumulator.generator.Reseed(seed)
+		accumulator.generator.reseed(seed)
 	}
 }
 
@@ -59,7 +59,7 @@ func (accumulator *Accumulator) allocateSource() uint8 {
 	return source
 }
 
-func (accumulator *Accumulator) EntropyDataChannel() chan<- struct {
+func (accumulator *Accumulator) entropyDataChannel() chan<- struct {
 	bytes  []byte
 	source uint8
 } {

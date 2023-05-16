@@ -6,15 +6,15 @@ import (
 )
 
 /** Chan for histogram */
-func randStream(e *engine.Engine, h uint64, l uint64) chan float64 {
-	c := make(chan float64)
-	go func() {
-		for {
-			c <- float64(e.GetRand(h, l))
-		}
-	}()
-	return c
-}
+//func randStream(e *engine.Engine, h int64, l int64) chan float64 {
+//	c := make(chan float64)
+//	go func() {
+//		for {
+//			c <- float64(e.GetRand(h, l))
+//		}
+//	}()
+//	return c
+//}
 
 func main() {
 	rngEngine := engine.NewEngine()
@@ -33,8 +33,8 @@ func main() {
 	//h := 100
 	//l := 0
 	//n := 200000
-	//hist := hist.NewHist(nil, "Example histogram", "fixed", h, false)
-	//c := randStream(rngEngine, uint64(h), uint64(l))
+	//hist := thist.NewHist(nil, "Distribution histogram", "fixed", h, false)
+	//c := randStream(rngEngine, int64(h), int64(l))
 	//i := 0
 	//for {
 	//	// add data point to hsitogram

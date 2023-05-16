@@ -34,7 +34,7 @@ func (generator *Generator) increment() {
 	}
 }
 
-func (generator *Generator) Reseed(seed []byte) {
+func (generator *Generator) reseed(seed []byte) {
 	hash := NewHasher()
 	hash.Write(generator.key)
 	hash.Write(seed)
@@ -60,7 +60,7 @@ func (generator *Generator) reset() {
 	generator.counter = make([]byte, generator.cipher.BlockSize())
 }
 
-func (generator *Generator) GenerateBlocks(data []byte, size uint) []byte {
+func (generator *Generator) generateBlocks(data []byte, size uint) []byte {
 	buffer := make([]byte, len(generator.counter))
 	for i := uint(0); i < size; i++ {
 		generator.cipher.Encrypt(buffer, generator.counter)
@@ -105,7 +105,7 @@ func (generator *Generator) setInitialSeed() {
 	}
 
 	buf := seedData.Bytes()
-	generator.Reseed(buf)
+	generator.reseed(buf)
 	wipe(buf)
 }
 
@@ -114,7 +114,7 @@ func (generator *Generator) numBlocks(n uint) uint {
 	return (n + k - 1) / k
 }
 
-func (generator *Generator) PseudoRandomData(size uint) []byte {
+func (generator *Generator) pseudoRandomData(size uint) []byte {
 	numBlocks := generator.numBlocks(size)
 	res := make([]byte, 0, numBlocks*uint(len(generator.counter)))
 
@@ -123,35 +123,19 @@ func (generator *Generator) PseudoRandomData(size uint) []byte {
 		if count > numBlocks {
 			count = maxBlocks
 		}
-		res = generator.GenerateBlocks(res, count)
+		res = generator.generateBlocks(res, count)
 		numBlocks -= count
 
-		newKey := generator.GenerateBlocks(nil, generator.numBlocks(keySize))
+		newKey := generator.generateBlocks(nil, generator.numBlocks(keySize))
 		generator.setKey(newKey[:keySize])
 	}
 
 	return res[:size]
 }
 
-func (generator *Generator) Int63() int64 {
-	randomBytes := generator.PseudoRandomData(8)
-	randomBytes[0] &= 0x7f
-	return bytesToInt64(randomBytes)
-}
-
-func (generator *Generator) Uint64() uint64 {
-	randomBytes := generator.PseudoRandomData(8)
-	return bytesToUint64(randomBytes)
-}
-
-func (generator *Generator) ReseedInt64(seed int64) {
+func (generator *Generator) reseedInt64(seed int64) {
 	seedBytes := int64ToBytes(seed)
-	generator.Reseed(seedBytes)
-}
-
-func (generator *Generator) Seed(seed int64) {
-	generator.reset()
-	generator.ReseedInt64(seed)
+	generator.reseed(seedBytes)
 }
 
 func NewGenerator(newCipher NewCipher) *Generator {
